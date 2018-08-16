@@ -1,4 +1,4 @@
-let mongoose = require('mongoose');
+let mongoose = require('../config/MongooseDB');
 let Schema = mongoose.Schema;
 
 let UserSchema = new Schema({
