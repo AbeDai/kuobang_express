@@ -1,3 +1,4 @@
+let getToken = require("../middleware/Token").getToken;
 let UserModel = require("../model/UserModel").UserModel;
 let {resJson} = require("../util/ResponseJsonUtil");
 
@@ -30,7 +31,7 @@ function userList(callback) {
     UserModel.find({}, (err, results) => {
         if (err) {
             callback(resJson(500, err.toString()));
-        }else {
+        } else {
             if (!results) {
                 callback(resJson(200, []));
             } else {
@@ -52,7 +53,8 @@ function userLoginTel(userTel, userPassword, callback) {
             callback(resJson(500, err.toString()));
         } else {
             if (results) {
-                callback(resJson(200, {login: true}));
+                let token = getToken(userTel);
+                callback(resJson(200, {login: true, token: token}));
             } else {
                 callback(resJson(200, {login: false}));
             }

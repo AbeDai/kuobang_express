@@ -1,3 +1,4 @@
+let checkToken = require("./middleware/Token").checkToken;
 let createError = require('http-errors');
 let express = require('express');
 let path = require('path');
@@ -27,6 +28,9 @@ app.all('*',function (req, res, next) {
         next();
     }
 });
+
+// token
+app.use(checkToken(["/users/login"]));
 
 // route
 app.use('/', indexRouter);
