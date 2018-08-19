@@ -54,7 +54,14 @@ function userLoginTel(userTel, userPassword, callback) {
         } else {
             if (results) {
                 let token = getToken(userTel);
-                callback(resJson(200, {login: true, token: token}));
+                let user = {
+                    UserTel:results.UserTel,
+                    WeChatId:results.WeChatId,
+                    UserNick:results.UserNick,
+                    UserState:results.UserState,
+                    UserAuthority:results.UserAuthority,
+                };
+                callback(resJson(200, {login: true, token: token, user: user}));
             } else {
                 callback(resJson(200, {login: false}));
             }
