@@ -1,6 +1,6 @@
 let getToken = require("../middleware/Token").getToken;
-let UserModel = require("../model/UserModel").UserModel;
 let {resJson} = require("../util/ResponseJsonUtil");
+let UserModel = require("../model/UserModel").UserModel;
 
 /**
  * 创建用户列表
@@ -19,6 +19,26 @@ function userCreate(userTel, userNick, userPassword, userState, userAuthority, c
             callback(resJson(500, err.toString()));
         } else {
             callback(resJson(200, "注册成功"));
+        }
+    });
+}
+
+/**
+ * 编辑用户信息
+ */
+function userEdit(userTel, nickName, password, state, authority, callback) {
+    let conditions = {UserTel: userTel};
+    let updates;
+    if (password) {
+        updates = {$set: {UserNick: nickName, UserPassword: password, UserState: state, UserAuthority: authority}};
+    }else {
+        updates = {$set: {UserNick: nickName, UserState: state, UserAuthority: authority}};
+    }
+    UserModel.update(conditions, updates, function (err) {
+        if (err) {
+            callback(resJson(500, err.toString()));
+        } else {
+            callback(resJson(200, "更新成功"));
         }
     });
 }
@@ -67,45 +87,4 @@ function userLoginTel(userTel, userPassword, callback) {
     })
 }
 
-/**
- * 验证手机号唯一性
- */
-function checkUniqueUserTel(userTel) {
-    return new Promise((resolve, reject) => {
-        UserModel.findOne({'UserTel': userTel}, (err, user) => {
-            if (user !== null) {
-                return reject();
-            } else {
-                return resolve();
-            }
-        });
-    });
-}
-
-/**
- * 验证用户状态
- */
-function checkUniqueUserState(state) {
-    return new Promise((resolve, reject) => {
-        if (state === 0 || state === 1) {
-            return resolve();
-        }else {
-            return reject();
-        }
-    });
-}
-
-/**
- * 验证用户权限
- */
-function checkUniqueUserAuthority(authority) {
-    return new Promise((resolve, reject) => {
-        if (authority === 0 || authority === 1) {
-            return resolve();
-        }else {
-            return reject();
-        }
-    });
-}
-
-module.exports = {userCreate, checkUniqueUserTel, checkUniqueUserState, checkUniqueUserAuthority, userList, userLoginTel};
+module.exports = {userCreate, userList, userLoginTel, userEdit};

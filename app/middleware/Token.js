@@ -2,22 +2,66 @@ let isInArray = require('../util/CollectionUtil').isInArray;
 let sign = require('jsonwebtoken').sign;
 let verify = require('jsonwebtoken').verify;
 let {resJson} = require("../util/ResponseJsonUtil");
+let UserModel = require("../model/UserModel").UserModel;
 
 const secret = 'kuobang_secret';
 
-function checkToken(excludePath) {
+function checkAuthorityToken(excludePath, rootPath, managerPath) {
     let finalExcludePath = (excludePath && excludePath instanceof Array) ? excludePath : [];
+    let finalRootPath = (rootPath && rootPath instanceof Array) ? rootPath : [];
+    let finalManagerPath = (managerPath && managerPath instanceof Array) ? managerPath : [];
     return function(req, res, next) {
         if (isInArray(finalExcludePath, req.path)) {
-            // exclude path without verify token
+            // 无需Token验证
             next();
         }else {
-            // verify token
+            // 需要Token验证
             let token = req.headers.authorization;
             if (token) {
+                // 解码Token
                 verify(token, secret, function (err, decoded) {
                     if (!err){
-                        next();
+                        if (isInArray(finalRootPath, req.path)) {
+                            // root权限验证
+                            UserModel.findOne({
+                                "UserTel": decoded.tel,
+                            }, (err, results) => {
+                                if (err) {
+                                    res.json(resJson(401, "token authorization error"))
+                                } else {
+                                    if (results) {
+                                        if (results.UserAuthority === 2) {
+                                            next();
+                                        }else {
+                                            res.json(resJson(401, "token authorization error"))
+                                        }
+                                    } else {
+                                        res.json(resJson(401, "token authorization error"))
+                                    }
+                                }
+                            });
+                        }else if (isInArray(finalManagerPath, req.path)) {
+                            // 管理员权限验证
+                            UserModel.findOne({
+                                "UserTel": decoded.tel,
+                            }, (err, results) => {
+                                if (err) {
+                                    res.json(resJson(401, "token authorization error"))
+                                } else {
+                                    if (results) {
+                                        if (results.UserAuthority === 1) {
+                                            next();
+                                        }else {
+                                            res.json(resJson(401, "token authorization error"))
+                                        }
+                                    } else {
+                                        res.json(resJson(401, "token authorization error"))
+                                    }
+                                }
+                            });
+                        }else {
+                            next();
+                        }
                     }else {
                         res.json(resJson(401, "token invalid"))
                     }
@@ -37,4 +81,4 @@ function getToken(tel) {
     });
 }
 
-module.exports = {checkToken, getToken};
+module.exports = {checkAuthorityToken, getToken};

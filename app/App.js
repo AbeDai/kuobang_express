@@ -1,4 +1,4 @@
-let checkToken = require("./middleware/Token").checkToken;
+let checkAuthorityToken = require("./middleware/Token").checkAuthorityToken;
 let createError = require('http-errors');
 let express = require('express');
 let path = require('path');
@@ -30,7 +30,7 @@ app.all('*',function (req, res, next) {
 });
 
 // token
-app.use(checkToken(["/users/login"]));
+app.use(checkAuthorityToken(["/users/login"], ["/users/list", "/users/edit", "/users/register"], []));
 
 // route
 app.use('/', indexRouter);
