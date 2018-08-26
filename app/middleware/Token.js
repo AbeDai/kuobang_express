@@ -13,7 +13,7 @@ function checkToken(excludePath) {
             next();
         }else {
             // verify token
-            let token = req.header.authorization;
+            let token = req.headers.authorization;
             if (token) {
                 verify(token, secret, function (err, decoded) {
                     if (!err){

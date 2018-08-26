@@ -5,11 +5,10 @@ let {resJson} = require("../util/ResponseJsonUtil");
 /**
  * 创建用户列表
  */
-function userCreate(userTel, weChatId, userNick, userPassword, userState, userAuthority, callback) {
+function userCreate(userTel, userNick, userPassword, userState, userAuthority, callback) {
     let newUser = new UserModel({
         UserId: Date.now(),
         UserTel: userTel,
-        WeChatId: weChatId,
         UserNick: userNick,
         UserPassword: userPassword,
         UserState: userState,
@@ -56,7 +55,6 @@ function userLoginTel(userTel, userPassword, callback) {
                 let token = getToken(userTel);
                 let user = {
                     UserTel:results.UserTel,
-                    WeChatId:results.WeChatId,
                     UserNick:results.UserNick,
                     UserState:results.UserState,
                     UserAuthority:results.UserAuthority,
@@ -67,21 +65,6 @@ function userLoginTel(userTel, userPassword, callback) {
             }
         }
     })
-}
-
-/**
- * 验证微信号唯一性
- */
-function checkUniqueWeChatId(weChatId) {
-    return new Promise((resolve, reject) => {
-        UserModel.findOne({'WeChatId': weChatId}, (err, user) => {
-            if (user !== null) {
-                return reject();
-            } else {
-                return resolve();
-            }
-        });
-    });
 }
 
 /**
@@ -99,4 +82,30 @@ function checkUniqueUserTel(userTel) {
     });
 }
 
-module.exports = {userCreate, checkUniqueWeChatId, checkUniqueUserTel, userList, userLoginTel};
+/**
+ * 验证用户状态
+ */
+function checkUniqueUserState(state) {
+    return new Promise((resolve, reject) => {
+        if (state === 0 || state === 1) {
+            return resolve();
+        }else {
+            return reject();
+        }
+    });
+}
+
+/**
+ * 验证用户权限
+ */
+function checkUniqueUserAuthority(authority) {
+    return new Promise((resolve, reject) => {
+        if (authority === 0 || authority === 1) {
+            return resolve();
+        }else {
+            return reject();
+        }
+    });
+}
+
+module.exports = {userCreate, checkUniqueUserTel, checkUniqueUserState, checkUniqueUserAuthority, userList, userLoginTel};

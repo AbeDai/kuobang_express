@@ -7,8 +7,6 @@ let UserSchema = new Schema({
     UserId: {type: String, unique: true},
     // 手机号
     UserTel: {type: String, unique: true},
-    // 微信ID
-    WeChatId: {type: String, unique: true},
     // 用户昵称
     UserNick: String,
     // 用户密码(MD5值)
