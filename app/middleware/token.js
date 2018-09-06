@@ -1,8 +1,8 @@
-let isInArray = require('../util/CollectionUtil').isInArray;
+let isInArray = require('../util/collection').isInArray;
 let sign = require('jsonwebtoken').sign;
 let verify = require('jsonwebtoken').verify;
-let {resJson} = require("../util/ResponseJsonUtil");
-let UserModel = require("../model/UserModel").UserModel;
+let {resJson} = require("../util/response");
+let UserModel = require("../model/user_model").UserModel;
 
 const secret = 'kuobang_secret';
 

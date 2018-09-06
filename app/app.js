@@ -1,12 +1,12 @@
-let checkAuthorityToken = require("./middleware/Token").checkAuthorityToken;
+let checkAuthorityToken = require("./middleware/token").checkAuthorityToken;
 let createError = require('http-errors');
 let express = require('express');
 let path = require('path');
 let cookieParser = require('cookie-parser');
 let logger = require('morgan');
 
-let indexRouter = require('./routes/IndexRoute');
-let usersRouter = require('./routes/UsersRoute');
+let indexRouter = require('./routes/index_route');
+let usersRouter = require('./routes/users_route');
 
 let app = express();
 

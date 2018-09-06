@@ -1,4 +1,4 @@
-let mongoose = require('../config/MongooseDB');
+let mongoose = require('../config/mongoose_db');
 let Schema = mongoose.Schema;
 
 // User表结构
@@ -17,6 +17,6 @@ let UserSchema = new Schema({
     UserAuthority: Number
 });
 
-let UserModel = mongoose.model('user', UserSchema);
+let User_model = mongoose.model('user', UserSchema);
 
-module.exports = {UserModel, UserSchema};
+module.exports = {UserModel: User_model, UserSchema};

@@ -1,4 +1,4 @@
-let UserModel = require("../model/UserModel").UserModel;
+let UserModel = require("../model/user_model").UserModel;
 
 /**
  * 验证手机号唯一性

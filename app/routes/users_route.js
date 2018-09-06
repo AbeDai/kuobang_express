@@ -3,9 +3,9 @@ let express = require("express");
 let router = express.Router();
 let {body} = require("express-validator/check");
 let validationResult = require("express-validator/check").validationResult;
-let {userCreate, userList, userLoginTel, userEdit} = require("../service/UsersService");
-let {checkUniqueUserTel, checkUniqueUserState, checkUniqueUserAuthority, checkMd5PasswordContainEmpty} = require("../util/CheckUtil");
-let {resJson} = require("../util/ResponseJsonUtil");
+let {userCreate, userList, userLoginTel, userEdit} = require("../service/users_service");
+let {checkUniqueUserTel, checkUniqueUserState, checkUniqueUserAuthority, checkMd5PasswordContainEmpty} = require("../util/check");
+let {resJson} = require("../util/response");
 
 /**
  * 用户列表

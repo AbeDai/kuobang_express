@@ -1,6 +1,6 @@
-let getToken = require("../middleware/Token").getToken;
-let {resJson} = require("../util/ResponseJsonUtil");
-let UserModel = require("../model/UserModel").UserModel;
+let getToken = require("../middleware/token").getToken;
+let {resJson} = require("../util/response");
+let UserModel = require("../model/user_model").UserModel;
 
 /**
  * 创建用户列表
