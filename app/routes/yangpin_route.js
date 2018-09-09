@@ -24,21 +24,18 @@ router.post("/add", [
     body("PinZhong")
         .isString()
         .isLength({
-            min: 5, max: 15
+            min: 2, max: 15
         })
-        .withMessage("品种应为5-15位字符"),
+        .withMessage("品种应为2-15位字符"),
     body("ShaZhi")
-        .isString()
-        .isLength({
-            min: 5, max: 15
-        })
-        .withMessage("纱织应为5-15位字符"),
+        .isFloat()
+        .withMessage("纱织应为浮点数"),
     body("ChenFeng")
         .isString()
         .isLength({
-            min: 5, max: 20
+            min: 1, max: 20
         })
-        .withMessage("成分应为5-20位字符"),
+        .withMessage("成分应为1-20位字符"),
     body("KeZhong")
         .isFloat()
         .withMessage("克重应为浮点数"),
@@ -77,22 +74,18 @@ router.post("/edit", [
     body("PinZhong")
         .isString()
         .isLength({
-            min: 5,
-            max: 15
+            min: 2, max: 15
         })
-        .withMessage("品种应为5-15位字符"),
+        .withMessage("品种应为2-15位字符"),
     body("ShaZhi")
-        .isString()
-        .isLength({
-            min: 5, max: 15
-        })
-        .withMessage("纱织应为5-15位字符"),
+        .isFloat()
+        .withMessage("纱织应为浮点数"),
     body("ChenFeng")
         .isString()
         .isLength({
-            min: 5, max: 20
+            min: 1, max: 20
         })
-        .withMessage("纱织应为5-20位字符"),
+        .withMessage("纱织应为1-20位字符"),
     body("KeZhong")
         .isFloat()
         .withMessage("克重应为浮点数"),

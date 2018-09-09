@@ -75,7 +75,7 @@ router.post("/edit", [
     if (!argumentError.isEmpty()) {
         return res.json(resJson(400, argumentError.mapped()));
     }
-    // 创建用户
+    // 编辑用户
     userEdit(req.body.UserTel, req.body.UserNick, req.body.UserPassword, req.body.UserState, req.body.UserAuthority, resJson => {
         res.json(resJson);
     });

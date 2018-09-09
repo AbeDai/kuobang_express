@@ -12,7 +12,7 @@ let YangPinSchema = new Schema({
     // 品种
     PinZhong: String,
     // 纱织
-    ShaZhi: String,
+    ShaZhi: Number,
     // 成分
     ChenFeng: String,
     // 克重
