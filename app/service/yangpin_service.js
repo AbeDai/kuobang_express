@@ -147,14 +147,51 @@ function yangPinDetail(YangPinID, callback) {
  * 获取样品列表
  * @param pageNum 当前页面
  * @param pageSize 每一页有多少元素
+ * @param pinZhong 品种
+ * @param chenFeng 成分
+ * @param shaZhiMin 纱支最小值
+ * @param shaZhiMax 纱支最大值
+ * @param keZhongMin 克重最小值
+ * @param keZhongMax 克重最大值
+ * @param menFuMin 门幅最小值
+ * * @param menFuMax 门幅最大值
  * @param callback 回调
  */
-function yangPinList(pageNum, pageSize, callback) {
-    YangPinModel.count({}, function (err, total) {
+function yangPinList(pageNum, pageSize, pinZhong, chenFeng,
+                     shaZhiMin, shaZhiMax, keZhongMin, keZhongMax,
+                     menFuMin, menFuMax, callback) {
+    let criteria = {};
+    if (pinZhong) {
+        let reg = new RegExp(`.*${pinZhong}.*`);
+        criteria["PinZhong"] = {$regex : reg}
+    }
+    if (chenFeng) {
+        let reg = new RegExp(`.*${chenFeng}.*`);
+        criteria["ChenFeng"] = {$regex : reg}
+    }
+    if (shaZhiMin || shaZhiMax){
+        criteria["ShaZhi"] = {
+            "$gte": shaZhiMin ? shaZhiMin : 0
+            , "$lte": shaZhiMax ? shaZhiMax : Number.MAX_SAFE_INTEGER
+        };
+    }
+    if (keZhongMin || keZhongMax){
+        criteria["KeZhong"] = {
+            "$gte": keZhongMin ? keZhongMin : 0
+            , "$lte": keZhongMax ? keZhongMax : Number.MAX_SAFE_INTEGER
+        };
+    }
+    if (menFuMin || menFuMax) {
+        criteria["MenFu"] = {
+            "$gte": menFuMin ? menFuMin : 0
+            , "$lte": menFuMax ? menFuMax : Number.MAX_SAFE_INTEGER
+        };
+    }
+    YangPinModel.count(criteria, function (err, total) {
         if (err) {
             callback(resJson(500, err.toString()));
         } else {
-            YangPinModel.find({}, (err, results) => {
+            YangPinModel.find(criteria, (err, results) => {
                 if (err) {
                     callback(resJson(500, err.toString()));
                 } else {

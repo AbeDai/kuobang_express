@@ -156,6 +156,22 @@ router.post("/list", [
     body("PageSize")
         .isInt()
         .withMessage("样品每页数量应为数字"),
+    body("PinZhong")
+        .optional({nullable:true}),
+    body("ChenFeng")
+        .optional({nullable:true}),
+    body("ShaZhiMin")
+        .optional({nullable:true}),
+    body("ShaZhiMax")
+        .optional({nullable:true}),
+    body("KeZhongMin")
+        .optional({nullable:true}),
+    body("KeZhongMax")
+        .optional({nullable:true}),
+    body("MenFuMin")
+        .optional({nullable:true}),
+    body("MenFuMax")
+        .optional({nullable:true})
 ], function (req, res) {
     // 验证参数格式
     let argumentError = validationResult(req);
@@ -163,7 +179,10 @@ router.post("/list", [
         return res.json(resJson(400, argumentError.mapped()));
     }
     // 获取样品列表
-    yangPinList(req.body.PageNum, req.body.PageSize, resJson => {
+    yangPinList(req.body.PageNum, req.body.PageSize, req.body.PinZhong, req.body.ChenFeng,
+        req.body.ShaZhiMin, req.body.ShaZhiMax,
+        req.body.KeZhongMin, req.body.KeZhongMax,
+        req.body.MenFuMin, req.body.MenFuMax, resJson => {
         res.json(resJson);
     });
 });
