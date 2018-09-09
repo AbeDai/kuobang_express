@@ -1,4 +1,5 @@
 let UserModel = require("../model/user_model").UserModel;
+let YangPinModel = require("../model/yangpin_model").YangPinModel;
 
 /**
  * 验证手机号唯一性
@@ -55,4 +56,19 @@ function checkMd5PasswordContainEmpty(password) {
     });
 }
 
-module.exports = {checkUniqueUserTel, checkUniqueUserState, checkUniqueUserAuthority, checkMd5PasswordContainEmpty};
+/**
+ * 验证样品编号唯一性
+ */
+function checkUniqueYangPinBianHao(binhao) {
+    return new Promise((resolve, reject) => {
+        YangPinModel.findOne({'BianHao': binhao}, (err, user) => {
+            if (user !== null) {
+                return reject();
+            } else {
+                return resolve();
+            }
+        });
+    });
+}
+
+module.exports = {checkUniqueUserTel, checkUniqueUserState, checkUniqueUserAuthority, checkMd5PasswordContainEmpty, checkUniqueYangPinBianHao};

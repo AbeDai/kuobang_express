@@ -31,6 +31,7 @@ function checkAuthorityToken(excludePath, rootPath, managerPath) {
                                 } else {
                                     if (results) {
                                         if (results.UserAuthority === 2) {
+                                            req.userInfo = results;
                                             next();
                                         }else {
                                             res.json(resJson(401, "token authorization error"))
@@ -50,6 +51,7 @@ function checkAuthorityToken(excludePath, rootPath, managerPath) {
                                 } else {
                                     if (results) {
                                         if (results.UserAuthority === 1) {
+                                            req.userInfo = results;
                                             next();
                                         }else {
                                             res.json(resJson(401, "token authorization error"))
@@ -60,7 +62,22 @@ function checkAuthorityToken(excludePath, rootPath, managerPath) {
                                 }
                             });
                         }else {
-                            next();
+                            // 无需权限验证
+                            // 获取用户
+                            UserModel.findOne({
+                                "UserTel": decoded.tel,
+                            }, (err, results) => {
+                                if (err) {
+                                    res.json(resJson(401, "token authorization error"))
+                                } else {
+                                    if (results) {
+                                        req.userInfo = results;
+                                        next();
+                                    } else {
+                                        res.json(resJson(401, "token authorization error"))
+                                    }
+                                }
+                            });
                         }
                     }else {
                         res.json(resJson(401, "token invalid"))

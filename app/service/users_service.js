@@ -74,6 +74,7 @@ function userLoginTel(userTel, userPassword, callback) {
             if (results) {
                 let token = getToken(userTel);
                 let user = {
+                    UserId:results.UserId,
                     UserTel:results.UserTel,
                     UserNick:results.UserNick,
                     UserState:results.UserState,

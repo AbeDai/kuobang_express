@@ -7,6 +7,7 @@ let logger = require('morgan');
 
 let indexRouter = require('./routes/index_route');
 let usersRouter = require('./routes/users_route');
+let yangPinRouter = require('./routes/yangpin_route');
 
 let app = express();
 
@@ -30,11 +31,13 @@ app.all('*',function (req, res, next) {
 });
 
 // token
-app.use(checkAuthorityToken(["/users/login"], ["/users/list", "/users/edit", "/users/register"], []));
+app.use(checkAuthorityToken(["/users/login"],
+    [, "/users/edit", "/users/register"], []));
 
 // route
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/yangPin', yangPinRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

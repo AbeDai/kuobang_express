@@ -13,7 +13,7 @@ let UserSchema = new Schema({
     UserPassword: String,
     // 用户状态(﻿0:离职 1:在职)
     UserState: Number,
-    // 用户权限(﻿0:普通用户 1:管理员)
+    // 用户权限(﻿0:普通用户 1:管理员 2:root用户)
     UserAuthority: Number
 });
 
