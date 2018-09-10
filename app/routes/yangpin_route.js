@@ -3,8 +3,7 @@ let express = require("express");
 let checkUniqueYangPinBianHao = require("../util/check").checkUniqueYangPinBianHao;
 let {yangPinList, yangPinCreate, yangPinDelete, yangPinUpdate, yangPinDetail} = require("../service/yangpin_service");
 let router = express.Router();
-let {body} = require("express-validator/check");
-let validationResult = require("express-validator/check").validationResult;
+let {body, validationResult} = require("express-validator/check");
 let {resJson} = require("../util/response");
 
 /**
