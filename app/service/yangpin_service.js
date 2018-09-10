@@ -5,7 +5,7 @@ let {resJson} = require("../util/response");
 /**
  * 创建样品
  */
-function yangPinCreate(userId, bianHao, pinZhong, shaZhi, chenFeng, keZhong, menFu, jiaGe, callback) {
+function yangPinCreate(userId, bianHao, pinZhong, shaZhi, chenFeng, keZhong, menFu, jiaGe, weizhi, beizhu, callback) {
     let curTime = Date.now();
     let newYangPin = new YangPinModel({
         YangPinID: curTime,
@@ -18,6 +18,8 @@ function yangPinCreate(userId, bianHao, pinZhong, shaZhi, chenFeng, keZhong, men
         MenFu: menFu,
         JiaGe: jiaGe,
         CreateTime: curTime,
+        WeiZhi:weizhi,
+        BeiZhu:beizhu,
     });
     newYangPin.save((err) => {
         if (err) {
@@ -32,7 +34,7 @@ function yangPinCreate(userId, bianHao, pinZhong, shaZhi, chenFeng, keZhong, men
  * 更新样品
  */
 function yangPinUpdate(userId, authority, yangPinID, bianHao, pinZhong, shaZhi, chenFeng,
-                       keZhong, menFu, jiaGe, callback) {
+                       keZhong, menFu, jiaGe, weizhi, beizhu, callback) {
     let conditions;
     let updates = {
         $set: {
@@ -43,6 +45,8 @@ function yangPinUpdate(userId, authority, yangPinID, bianHao, pinZhong, shaZhi, 
             KeZhong: keZhong,
             MenFu: menFu,
             JiaGe: jiaGe,
+            WeiZhi: weizhi,
+            BeiZhu: beizhu
         }
     };
     if (authority === 1 || authority === 2) {
@@ -135,6 +139,8 @@ function yangPinDetail(YangPinID, callback) {
                         MenFu: yangPin.MenFu,
                         JiaGe: yangPin.JiaGe,
                         CreateTime: yangPin.CreateTime,
+                        WeiZhi: yangPin.WeiZhi,
+                        BeiZhu: yangPin.BeiZhu
                     };
                     callback(resJson(200, data));
                 }

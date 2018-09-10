@@ -44,6 +44,18 @@ router.post("/add", [
     body("JiaGe")
         .isFloat()
         .withMessage("价格应为浮点数"),
+    body("WeiZhi")
+        .isString()
+        .isLength({
+            min: 1, max: 20
+        })
+        .withMessage("位置应为1-20位字符"),
+    body("BeiZhu")
+        .isString()
+        .isLength({
+            min: 0, max: 500
+        })
+        .withMessage("备注应为1-500位字符"),
 ], function (req, res) {
     // 验证参数格式
     let argumentError = validationResult(req);
@@ -52,7 +64,7 @@ router.post("/add", [
     }
     // 创建样品
     yangPinCreate(req.userInfo.UserId, req.body.BianHao, req.body.PinZhong, req.body.ShaZhi, req.body.ChenFeng,
-        req.body.KeZhong, req.body.MenFu, req.body.JiaGe, resJson => {
+        req.body.KeZhong, req.body.MenFu, req.body.JiaGe, req.body.WeiZhi, req.body.BeiZhu, resJson => {
         res.json(resJson);
     });
 });
@@ -94,6 +106,18 @@ router.post("/edit", [
     body("JiaGe")
         .isFloat()
         .withMessage("价格应为浮点数"),
+    body("WeiZhi")
+        .isString()
+        .isLength({
+            min: 1, max: 20
+        })
+        .withMessage("位置应为1-20位字符"),
+    body("BeiZhu")
+        .isString()
+        .isLength({
+            min: 0, max: 500
+        })
+        .withMessage("备注应为1-500位字符"),
 ], function (req, res) {
     // 验证参数格式
     let argumentError = validationResult(req);
@@ -101,8 +125,9 @@ router.post("/edit", [
         return res.json(resJson(400, argumentError.mapped()));
     }
     // 编辑样品
-    yangPinUpdate(req.userInfo.UserId, req.userInfo.UserAuthority, req.body.YangPinID, req.body.BianHao, req.body.PinZhong, req.body.ShaZhi, req.body.ChenFeng,
-        req.body.KeZhong, req.body.MenFu, req.body.JiaGe, resJson => {
+    yangPinUpdate(req.userInfo.UserId, req.userInfo.UserAuthority, req.body.YangPinID, req.body.BianHao, req.body.PinZhong,
+        req.body.ShaZhi, req.body.ChenFeng, req.body.KeZhong, req.body.MenFu, req.body.JiaGe,
+        req.body.WeiZhi, req.body.BeiZhu, resJson => {
             res.json(resJson);
         });
 });

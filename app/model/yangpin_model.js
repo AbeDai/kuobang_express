@@ -19,10 +19,14 @@ let YangPinSchema = new Schema({
     KeZhong: Number,
     // 门幅
     MenFu: Number,
+    // 位置
+    WeiZhi: String,
     // 价格
     JiaGe: Number,
     // 样品创建时间
     CreateTime: String,
+    // 备注
+    BeiZhu: String,
 });
 
 let YangPinModel = mongoose.model('yangpin', YangPinSchema);
