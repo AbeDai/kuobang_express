@@ -8,12 +8,13 @@ let logger = require('morgan');
 let indexRouter = require('./routes/index_route');
 let usersRouter = require('./routes/users_route');
 let yangPinRouter = require('./routes/yangpin_route');
+let fileRouter = require('./routes/file_route');
 
 let app = express();
 
 app.use(logger('dev'));
 app.use(express.json());
-app.use(express.urlencoded({extended: false}));
+app.use(express.urlencoded({limit: '15mb', extended: true, parameterLimit: 1000000}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -38,6 +39,7 @@ app.use(checkAuthorityToken(["/users/login"],
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/yangPin', yangPinRouter);
+app.use('/file', fileRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
