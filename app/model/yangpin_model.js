@@ -27,6 +27,11 @@ let YangPinSchema = new Schema({
     CreateTime: String,
     // 备注
     BeiZhu: String,
+    // 样品图片
+    Images: [{
+        FileID: String,
+        FileUrl: String
+    }]
 });
 
 let YangPinModel = mongoose.model('yangpin', YangPinSchema);

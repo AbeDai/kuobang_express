@@ -21,4 +21,16 @@ function putFile(name, path, callback) {
     });
 }
 
-module.exports = {putFile};
+/**
+ * 删除文件
+ * @param name 文件名
+ */
+function deleteFile(name, callback) {
+    client.delete(name).then(function (resValue) {
+        callback(null, resValue);
+    }).catch(function (error) {
+        callback(error, null);
+    });
+}
+
+module.exports = {putFile, deleteFile};

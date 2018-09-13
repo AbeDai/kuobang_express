@@ -1,10 +1,25 @@
-
 let express = require("express");
 let checkUniqueYangPinBianHao = require("../util/check").checkUniqueYangPinBianHao;
-let {yangPinList, yangPinCreate, yangPinDelete, yangPinUpdate, yangPinDetail} = require("../service/yangpin_service");
+let {yangPinList, yangPinCreate, yangPinDelete, yangPinUpdate, yangPinDetail, yangPinAddImage, yangPinDeleteImage} = require("../service/yangpin_service");
 let router = express.Router();
 let {body, validationResult} = require("express-validator/check");
+let multer = require('multer');
+let {checkYangPingEditAuthority} = require("../service/yangpin_service");
+let {uploadImg, deleteImg} = require("../service/file_service");
 let {resJson} = require("../util/response");
+
+/**
+ * 图片上传验证条件
+ */
+let imgFilter = function (req, file, cb) {
+    let originalName = file.originalname;
+    let lastIndex = originalName.lastIndexOf(".");
+    let suffix = originalName.substring(lastIndex, originalName.length);
+    req.isSuffixMatch = (suffix === ".png" || suffix === ".jpg" || suffix === ".jpeg");
+    cb(null, true);
+};
+let imgUpload = multer({dest: "./uploads", fileFilter: imgFilter});
+
 
 /**
  * 添加样品
@@ -65,8 +80,8 @@ router.post("/add", [
     // 创建样品
     yangPinCreate(req.userInfo.UserId, req.body.BianHao, req.body.PinZhong, req.body.ShaZhi, req.body.ChenFeng,
         req.body.KeZhong, req.body.MenFu, req.body.JiaGe, req.body.WeiZhi, req.body.BeiZhu, resJson => {
-        res.json(resJson);
-    });
+            res.json(resJson);
+        });
 });
 
 /**
@@ -118,18 +133,95 @@ router.post("/edit", [
             min: 0, max: 500
         })
         .withMessage("备注应为1-500位字符"),
-], function (req, res) {
+], async function (req, res) {
     // 验证参数格式
     let argumentError = validationResult(req);
     if (!argumentError.isEmpty()) {
         return res.json(resJson(400, argumentError.mapped()));
     }
-    // 编辑样品
-    yangPinUpdate(req.userInfo.UserId, req.userInfo.UserAuthority, req.body.YangPinID, req.body.BianHao, req.body.PinZhong,
-        req.body.ShaZhi, req.body.ChenFeng, req.body.KeZhong, req.body.MenFu, req.body.JiaGe,
-        req.body.WeiZhi, req.body.BeiZhu, resJson => {
-            res.json(resJson);
+    // 验证操作权限
+    if (await checkYangPingEditAuthority(req.userInfo.UserId, req.userInfo.UserAuthority, req.body.YangPinID)) {
+        // 编辑样品
+        yangPinUpdate(req.body.YangPinID, req.body.BianHao, req.body.PinZhong,
+            req.body.ShaZhi, req.body.ChenFeng, req.body.KeZhong, req.body.MenFu, req.body.JiaGe,
+            req.body.WeiZhi, req.body.BeiZhu, resJson => {
+                res.json(resJson);
+            });
+    } else {
+        callback(resJson(401, "token invalid"));
+    }
+});
+
+/**
+ * 添加样品图片
+ */
+router.post("/addImage", [
+    body("YangPinID")
+        .isString()
+        .withMessage("样品编号应为字符串"),
+    imgUpload.single('ImageFile'),
+], async function (req, res) {
+    // 验证参数格式
+    let argumentError = validationResult(req);
+    if (!argumentError.isEmpty()) {
+        return res.json(resJson(400, argumentError.mapped()));
+    }
+    // 验证操作权限
+    if (await checkYangPingEditAuthority(req.userInfo.UserId, req.userInfo.UserAuthority, req.body.YangPinID)) {
+        // 上传图片到OSS
+        const {file, isSuffixMatch} = req;
+        if (!isSuffixMatch) {
+            // 图片格式出错，必须要png,jpg,jpeg
+            return res.json(resJson(400, "图片格式出错"));
+        } else if (!file) {
+            // 文件不存在
+            return res.json(resJson(400, "文件上传失败"));
+        } else {
+            uploadImg(file, resJson => {
+                if (resJson.code === 200) {
+                    // 上传OSS成功
+                    yangPinAddImage(req.body.YangPinID, resJson.FileID, resJson.Url, resJson => {
+                        res.json(resJson);
+                    });
+                } else {
+                    // 上传OSS失败
+                    return res.json(resJson(400, "上传OSS操作失败"));
+                }
+            });
+        }
+    } else {
+        callback(resJson(401, "token invalid"));
+    }
+});
+
+/**
+ * 删除样品图片
+ */
+router.post("/deleteImage", [
+    body("YangPinID")
+        .isString()
+        .withMessage("样品编号应为字符串"),
+    body("ImageID")
+        .isString()
+        .withMessage("样品图片编号应为字符串"),
+], async function (req, res) {
+    // 验证参数格式
+    let argumentError = validationResult(req);
+    if (!argumentError.isEmpty()) {
+        return res.json(resJson(400, argumentError.mapped()));
+    }
+    // 验证操作权限
+    if (await checkYangPingEditAuthority(req.userInfo.UserId, req.userInfo.UserAuthority, req.body.YangPinID)) {
+        deleteImg(fileId, deleteJson => {
+            if (deleteJson.code === 200) {
+                yangPinDeleteImage(req.body.YangPinID, req.body.ImageID, resJson => {
+                    res.json(resJson);
+                });
+            }
         });
+    } else {
+        callback(resJson(401, "token invalid"));
+    }
 });
 
 /**
@@ -139,16 +231,21 @@ router.post("/delete", [
     body("YangPinID")
         .isString()
         .withMessage("样品编号应为字符串"),
-], function (req, res) {
+], async function (req, res) {
     // 验证参数格式
     let argumentError = validationResult(req);
     if (!argumentError.isEmpty()) {
         return res.json(resJson(400, argumentError.mapped()));
     }
-    // 删除样品
-    yangPinDelete(req.userInfo.UserId, req.userInfo.UserAuthority, req.body.YangPinID, resJson => {
+    // 验证操作权限
+    if (await checkYangPingEditAuthority(req.userInfo.UserId, req.userInfo.UserAuthority, req.body.YangPinID)) {
+        // 删除样品
+        yangPinDelete(req.userInfo.UserId, req.userInfo.UserAuthority, req.body.YangPinID, resJson => {
             res.json(resJson);
         });
+    } else {
+        callback(resJson(401, "token invalid"));
+    }
 });
 
 /**
@@ -181,21 +278,21 @@ router.post("/list", [
         .isInt()
         .withMessage("样品每页数量应为数字"),
     body("PinZhong")
-        .optional({nullable:true}),
+        .optional({nullable: true}),
     body("ChenFeng")
-        .optional({nullable:true}),
+        .optional({nullable: true}),
     body("ShaZhiMin")
-        .optional({nullable:true}),
+        .optional({nullable: true}),
     body("ShaZhiMax")
-        .optional({nullable:true}),
+        .optional({nullable: true}),
     body("KeZhongMin")
-        .optional({nullable:true}),
+        .optional({nullable: true}),
     body("KeZhongMax")
-        .optional({nullable:true}),
+        .optional({nullable: true}),
     body("MenFuMin")
-        .optional({nullable:true}),
+        .optional({nullable: true}),
     body("MenFuMax")
-        .optional({nullable:true})
+        .optional({nullable: true})
 ], function (req, res) {
     // 验证参数格式
     let argumentError = validationResult(req);
@@ -207,8 +304,8 @@ router.post("/list", [
         req.body.ShaZhiMin, req.body.ShaZhiMax,
         req.body.KeZhongMin, req.body.KeZhongMax,
         req.body.MenFuMin, req.body.MenFuMax, resJson => {
-        res.json(resJson);
-    });
+            res.json(resJson);
+        });
 });
 
 module.exports = router;

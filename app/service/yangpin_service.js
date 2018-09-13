@@ -1,4 +1,4 @@
-let YangPinModel = require("../model/yangpin_model").YangPinModel;
+let {YangPinModel} = require("../model/yangpin_model");
 let UserModel = require("../model/user_model").UserModel;
 let {resJson} = require("../util/response");
 
@@ -18,8 +18,8 @@ function yangPinCreate(userId, bianHao, pinZhong, shaZhi, chenFeng, keZhong, men
         MenFu: menFu,
         JiaGe: jiaGe,
         CreateTime: curTime,
-        WeiZhi:weizhi,
-        BeiZhu:beizhu,
+        WeiZhi: weizhi,
+        BeiZhu: beizhu,
     });
     newYangPin.save((err) => {
         if (err) {
@@ -33,9 +33,8 @@ function yangPinCreate(userId, bianHao, pinZhong, shaZhi, chenFeng, keZhong, men
 /**
  * 更新样品
  */
-function yangPinUpdate(userId, authority, yangPinID, bianHao, pinZhong, shaZhi, chenFeng,
+function yangPinUpdate(yangPinID, bianHao, pinZhong, shaZhi, chenFeng,
                        keZhong, menFu, jiaGe, weizhi, beizhu, callback) {
-    let conditions;
     let updates = {
         $set: {
             BianHao: bianHao,
@@ -49,60 +48,70 @@ function yangPinUpdate(userId, authority, yangPinID, bianHao, pinZhong, shaZhi, 
             BeiZhu: beizhu
         }
     };
-    if (authority === 1 || authority === 2) {
-        conditions = {
-            "YangPinID": yangPinID,
-        };
-        YangPinModel.update(conditions, updates, function (err) {
-            if (err) {
-                callback(resJson(500, err.toString()));
-            } else {
-                callback(resJson(200, "更新成功"));
+    let conditions = {
+        "YangPinID": yangPinID,
+    };
+    YangPinModel.update(conditions, updates, function (err) {
+        if (err) {
+            callback(resJson(500, err.toString()));
+        } else {
+            callback(resJson(200, "更新成功"));
+        }
+    });
+}
+
+/**
+ * 添加样品图片
+ */
+function yangPinAddImage(yangPinID, fileID, fileUrl, callback) {
+    let conditions = {
+        "YangPinID": yangPinID,
+    };
+    let updates = {
+        $pull: {
+            Images: {
+                FileID: fileID,
+                FileUrl: fileUrl
             }
-        });
-    }else {
-        conditions = {
-            "YangPinID": yangPinID,
-            "UserID":userId
-        };
-        YangPinModel.findOne({
-            "YangPinID": yangPinID,
-        }, (err, yangPin) => {
-            if (err) {
-                callback(resJson(500, err.toString()));
-            } else {
-                if (yangPin.UserID === userId) {
-                    YangPinModel.update(conditions, updates, function (err) {
-                        if (err) {
-                            callback(resJson(500, err.toString()));
-                        } else {
-                            callback(resJson(200, "更新成功"));
-                        }
-                    });
-                }else {
-                    callback(resJson(401, "token invalid"));
-                }
-            }
-        });
-    }
+        }
+    };
+    YangPinModel.update(conditions, updates, function (err) {
+        if (err) {
+            callback(resJson(500, err.toString()));
+        } else {
+            callback(resJson(200, "图片添加成功"));
+        }
+    });
+}
+
+/**
+ * 删除样品图片
+ */
+function yangPinDeleteImage(yangPinID, fileID, callback) {
+    let updates = {
+        $pull: {
+            Images: {FileID: fileID}
+        }
+    };
+    let conditions = {
+        "YangPinID": yangPinID,
+    };
+    YangPinModel.update(conditions, updates, function (err) {
+        if (err) {
+            callback(resJson(500, err.toString()));
+        } else {
+            callback(resJson(200, "图片删除成功"));
+        }
+    });
 }
 
 /**
  * 删除样品
  */
-function yangPinDelete(userId, authority, YangPinID, callback) {
-    let criteria;
-    if (authority === 1 || authority === 2) {
-        criteria = {
-            "YangPinID": YangPinID,
-        };
-    }else {
-        criteria = {
-            "YangPinID": YangPinID,
-            "UserID":userId
-        };
-    }
-    YangPinModel.remove(criteria, (err, results) => {
+function yangPinDelete(yangPinID, callback) {
+    YangPinModel.remove({
+        "YangPinID": yangPinID,
+    }, (err, results) => {
         if (err) {
             callback(resJson(500, err.toString()));
         } else {
@@ -140,7 +149,8 @@ function yangPinDetail(YangPinID, callback) {
                         JiaGe: yangPin.JiaGe,
                         CreateTime: yangPin.CreateTime,
                         WeiZhi: yangPin.WeiZhi,
-                        BeiZhu: yangPin.BeiZhu
+                        BeiZhu: yangPin.BeiZhu,
+                        Images: yangPin.Images
                     };
                     callback(resJson(200, data));
                 }
@@ -169,19 +179,19 @@ function yangPinList(pageNum, pageSize, pinZhong, chenFeng,
     let criteria = {};
     if (pinZhong) {
         let reg = new RegExp(`.*${pinZhong}.*`);
-        criteria["PinZhong"] = {$regex : reg}
+        criteria["PinZhong"] = {$regex: reg}
     }
     if (chenFeng) {
         let reg = new RegExp(`.*${chenFeng}.*`);
-        criteria["ChenFeng"] = {$regex : reg}
+        criteria["ChenFeng"] = {$regex: reg}
     }
-    if (shaZhiMin || shaZhiMax){
+    if (shaZhiMin || shaZhiMax) {
         criteria["ShaZhi"] = {
             "$gte": shaZhiMin ? shaZhiMin : 0
             , "$lte": shaZhiMax ? shaZhiMax : Number.MAX_SAFE_INTEGER
         };
     }
-    if (keZhongMin || keZhongMax){
+    if (keZhongMin || keZhongMax) {
         criteria["KeZhong"] = {
             "$gte": keZhongMin ? keZhongMin : 0
             , "$lte": keZhongMax ? keZhongMax : Number.MAX_SAFE_INTEGER
@@ -216,4 +226,23 @@ function yangPinList(pageNum, pageSize, pinZhong, chenFeng,
     });
 }
 
-module.exports = {yangPinCreate, yangPinDelete, yangPinUpdate, yangPinList, yangPinDetail};
+/**
+ * 验证样品权限
+ */
+async function checkYangPingEditAuthority(userId, authority, yangPinID) {
+    let criteria;
+    if (authority === 1 || authority === 2) {
+        criteria = {
+            "YangPinID": yangPinID,
+        };
+    } else {
+        criteria = {
+            "YangPinID": yangPinID,
+            "UserID": userId
+        };
+    }
+    let yangPin = await YangPinModel.findOne(criteria);
+    return !!yangPin;
+}
+
+module.exports = {checkYangPingEditAuthority, yangPinCreate, yangPinDelete, yangPinUpdate, yangPinList, yangPinDetail, yangPinAddImage, yangPinDeleteImage};
