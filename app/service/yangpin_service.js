@@ -68,7 +68,7 @@ function yangPinAddImage(yangPinID, fileID, fileUrl, callback) {
         "YangPinID": yangPinID,
     };
     let updates = {
-        $pull: {
+        $push: {
             Images: {
                 FileID: fileID,
                 FileUrl: fileUrl
@@ -79,7 +79,10 @@ function yangPinAddImage(yangPinID, fileID, fileUrl, callback) {
         if (err) {
             callback(resJson(500, err.toString()));
         } else {
-            callback(resJson(200, "图片添加成功"));
+            callback(resJson(200, {
+                FileID: fileID,
+                FileUrl: fileUrl
+            }));
         }
     });
 }

@@ -148,7 +148,7 @@ router.post("/edit", [
                 res.json(resJson);
             });
     } else {
-        callback(resJson(401, "token invalid"));
+        res.json(resJson(401, "token invalid"));
     }
 });
 
@@ -176,10 +176,10 @@ router.post("/addImage", imgUpload.single('ImageFile'), [
             // 文件不存在
             return res.json(resJson(400, "文件上传失败"));
         } else {
-            uploadImg(file, resJson => {
-                if (resJson.code === 200) {
+            uploadImg(file, result => {
+                if (result.code === 200) {
                     // 上传OSS成功
-                    yangPinAddImage(req.body.YangPinID, resJson.FileID, resJson.Url, resJson => {
+                    yangPinAddImage(req.body.YangPinID, result.data.FileID, result.data.Url, resJson => {
                         res.json(resJson);
                     });
                 } else {
@@ -189,7 +189,7 @@ router.post("/addImage", imgUpload.single('ImageFile'), [
             });
         }
     } else {
-        callback(resJson(401, "token invalid"));
+        res.json(resJson(401, "token invalid"));
     }
 });
 
@@ -211,15 +211,15 @@ router.post("/deleteImage", [
     }
     // 验证操作权限
     if (await checkYangPingEditAuthority(req.userInfo.UserId, req.userInfo.UserAuthority, req.body.YangPinID)) {
-        deleteImg(fileId, deleteJson => {
-            if (deleteJson.code === 200) {
-                yangPinDeleteImage(req.body.YangPinID, req.body.ImageID, resJson => {
+        yangPinDeleteImage(req.body.YangPinID, req.body.ImageID, resJson => {
+            if (resJson.code === 200) {
+                deleteImg(req.body.ImageID, (_) => {
                     res.json(resJson);
                 });
             }
         });
     } else {
-        callback(resJson(401, "token invalid"));
+        res.json(resJson(401, "token invalid"));
     }
 });
 
@@ -243,7 +243,7 @@ router.post("/delete", [
             res.json(resJson);
         });
     } else {
-        callback(resJson(401, "token invalid"));
+        res.json(resJson(401, "token invalid"));
     }
 });
 

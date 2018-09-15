@@ -43,24 +43,28 @@ function uploadImg(file, callback) {
  * 删除图片
  */
 function deleteImg(fileId, callback) {
-    getImageById(fileId, resJson => {
-        if (resJson.code === 200){
+    getImageById(fileId, result => {
+        if (result.code === 200){
             // 查找图片信息
-            let data = resJson.data;
-            let fileName = data.Name;
-            deleteFile(fileName, function (err, resValue) {
-                if (err) {
-                    return callback(resJson(500, err.toString()));
-                }
-                // 从数据库中删除文件
-                FileModel.remove({FileID: fileId}, function (error) {
-                    if (error) {
+            let data = result.data;
+            if (data){
+                let fileName = data.Name;
+                deleteFile(fileName, function (err, resValue) {
+                    if (err) {
                         return callback(resJson(500, err.toString()));
-                    } else {
-                        return callback(resJson(200, "删除成功"));
                     }
+                    // 从数据库中删除文件
+                    FileModel.remove({FileID: fileId}, function (error) {
+                        if (error) {
+                            return callback(resJson(500, err.toString()));
+                        } else {
+                            return callback(resJson(200, "删除成功"));
+                        }
+                    });
                 });
-            });
+            } else {
+                return callback(resJson(500, "图片不存在"));
+            }
         }
     });
 }
