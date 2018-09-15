@@ -155,11 +155,10 @@ router.post("/edit", [
 /**
  * 添加样品图片
  */
-router.post("/addImage", [
+router.post("/addImage", imgUpload.single('ImageFile'), [
     body("YangPinID")
         .isString()
         .withMessage("样品编号应为字符串"),
-    imgUpload.single('ImageFile'),
 ], async function (req, res) {
     // 验证参数格式
     let argumentError = validationResult(req);
