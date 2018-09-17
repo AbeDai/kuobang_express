@@ -33,6 +33,7 @@ router.post("/login", [
     if (!argumentError.isEmpty()) {
         return res.json(resJson(400, argumentError.mapped()));
     }
+    console.log(req.body.UserTel + "" + req.body.UserPassword);
     // 创建用户
     userLoginTel(req.body.UserTel, req.body.UserPassword, resJson => {
         res.json(resJson);

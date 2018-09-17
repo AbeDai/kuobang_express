@@ -64,6 +64,13 @@ function userList(callback) {
  * 登录用户
  */
 function userLoginTel(userTel, userPassword, callback) {
+    UserModel.findOne({}, (err, results) => {
+        if (err) {
+            callback(resJson(500, err.toString()));
+        } else {
+            console.log(JSON.stringify(results));
+        }
+    });
     UserModel.findOne({
         "UserTel": userTel,
         "UserPassword": userPassword
@@ -71,6 +78,7 @@ function userLoginTel(userTel, userPassword, callback) {
         if (err) {
             callback(resJson(500, err.toString()));
         } else {
+
             if (results) {
                 let token = getToken(userTel);
                 let user = {
