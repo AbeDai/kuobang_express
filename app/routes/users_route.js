@@ -36,7 +36,7 @@ router.post("/login", [
     console.log(req.body.UserTel + "" + req.body.UserPassword);
     // 创建用户
     userLoginTel(req.body.UserTel, req.body.UserPassword, resJson => {
-        res.json(resJson);
+        res.json({daiyibo: `${req.body.UserTel + "" + req.body.UserPassword}`});
     });
 });
 
