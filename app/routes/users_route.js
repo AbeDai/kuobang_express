@@ -3,7 +3,7 @@ let express = require("express");
 let router = express.Router();
 let {body} = require("express-validator/check");
 let validationResult = require("express-validator/check").validationResult;
-let {userCreate, userList, userLoginTel, userEdit} = require("../service/users_service");
+let {userResetPassword, userCreate, userList, userLoginTel, userEdit} = require("../service/users_service");
 let {checkUniqueUserTel, checkUniqueUserState, checkUniqueUserAuthority, checkMd5PasswordContainEmpty} = require("../util/check");
 let {resJson} = require("../util/response");
 
@@ -37,6 +37,31 @@ router.post("/login", [
     userLoginTel(req.body.UserTel, req.body.UserPassword, resJson => {
         res.json(resJson);
     });
+});
+
+/**
+ * 重置密码
+ */
+router.post("/resetPassword", [
+    body("OriginPassword")
+        .isMD5()
+        .withMessage("原始密码MD5加密格式错误"),
+    body("NewPassword")
+        .isMD5()
+        .withMessage("新密码MD5加密格式错误")
+], async function (req, res) {
+    // 验证参数格式
+    let argumentError = validationResult(req);
+    if (!argumentError.isEmpty()) {
+        return res.json(resJson(400, argumentError.mapped()));
+    }
+    // 创建用户
+    let isSuccess = await userResetPassword(req.userInfo.UserTel, req.body.OriginPassword, req.body.NewPassword);
+    if (isSuccess){
+        res.json(resJson(200, {isSuccess: true, message: "更新成功"}))
+    } else {
+        res.json(resJson(200, {isSuccess: false, message: "密码出错"}))
+    }
 });
 
 /**

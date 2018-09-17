@@ -31,7 +31,7 @@ function userEdit(userTel, nickName, password, state, authority, callback) {
     let updates;
     if (password) {
         updates = {$set: {UserNick: nickName, UserPassword: password, UserState: state, UserAuthority: authority}};
-    }else {
+    } else {
         updates = {$set: {UserNick: nickName, UserState: state, UserAuthority: authority}};
     }
     UserModel.update(conditions, updates, function (err) {
@@ -61,6 +61,16 @@ function userList(callback) {
 }
 
 /**
+ * 重置用户密码
+ */
+async function userResetPassword(userTel, originPassword, newPassword) {
+    let conditions = {UserTel: userTel, UserPassword: originPassword};
+    let updates = {$set: {UserPassword: newPassword}};
+    let result = await UserModel.update(conditions, updates);
+    return result["n"] === 1 && result["nModified"] === 1;
+}
+
+/**
  * 登录用户
  */
 function userLoginTel(userTel, userPassword, callback) {
@@ -74,11 +84,11 @@ function userLoginTel(userTel, userPassword, callback) {
             if (results) {
                 let token = getToken(userTel);
                 let user = {
-                    UserId:results.UserId,
-                    UserTel:results.UserTel,
-                    UserNick:results.UserNick,
-                    UserState:results.UserState,
-                    UserAuthority:results.UserAuthority,
+                    UserId: results.UserId,
+                    UserTel: results.UserTel,
+                    UserNick: results.UserNick,
+                    UserState: results.UserState,
+                    UserAuthority: results.UserAuthority,
                 };
                 callback(resJson(200, {login: true, token: token, user: user}));
             } else {
@@ -88,4 +98,4 @@ function userLoginTel(userTel, userPassword, callback) {
     })
 }
 
-module.exports = {userCreate, userList, userLoginTel, userEdit};
+module.exports = {userResetPassword, userCreate, userList, userLoginTel, userEdit};
